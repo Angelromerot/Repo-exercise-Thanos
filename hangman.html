@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hangman</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --text: #e8eaed;
+      --muted: #8b919a;
+      --accent-win: #6ee7b7;
+      --accent-lose: #f87171;
+      --btn: #252a36;
+      --btn-hover: #2f3545;
+      --radius: 12px;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .game {
+      width: 100%;
+      max-width: 720px;
+      position: relative;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    header h1 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .figure-panel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .figure-panel svg {
+      width: 100%;
+      max-width: 200px;
+      height: auto;
+    }
+
+    .figure-panel svg [data-stage] {
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .figure-panel svg [data-stage].visible {
+      opacity: 1;
+    }
+
+    .figure-panel svg .gallows {
+      opacity: 1;
+    }
+
+    .info-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    #word-display {
+      font-size: 1.75rem;
+      font-weight: 600;
+      letter-spacing: 0.35em;
+      text-align: center;
+      min-height: 2.5rem;
+    }
+
+    #word-display.reveal-answer {
+      color: var(--accent-lose);
+      letter-spacing: 0.2em;
+    }
+
+    #word-display.win {
+      color: var(--accent-win);
+    }
+
+    #wrong-counter {
+      font-size: 1rem;
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    #wrong-counter.danger {
+      color: var(--accent-lose);
+    }
+
+    .keyboard {
+      display: grid;
+      grid-template-columns: repeat(13, 1fr);
+      gap: 0.5rem;
+    }
+
+    .keyboard button {
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      aspect-ratio: 1;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      background: var(--btn);
+      color: var(--text);
+      cursor: pointer;
+      transition: background 0.15s, transform 0.15s, border-color 0.15s;
+    }
+
+    .keyboard button:hover:not(:disabled) {
+      background: var(--btn-hover);
+      transform: translateY(-2px);
+    }
+
+    .keyboard button:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+
+    .keyboard button.correct {
+      border-color: var(--accent-win);
+      opacity: 0.7;
+    }
+
+    .keyboard button.wrong {
+      border-color: var(--accent-lose);
+      opacity: 0.7;
+    }
+
+    .overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      border-radius: var(--radius);
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    .overlay.show {
+      display: flex;
+    }
+
+    .overlay-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 2rem 2.5rem;
+      text-align: center;
+      max-width: 90%;
+    }
+
+    .overlay-card h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+
+    .overlay-card.win h2 {
+      color: var(--accent-win);
+    }
+
+    .overlay-card.lose h2 {
+      color: var(--accent-lose);
+    }
+
+    .overlay-card p {
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+      font-size: 1.05rem;
+    }
+
+    .overlay-card p strong {
+      color: var(--text);
+      font-weight: 600;
+      letter-spacing: 0.1em;
+    }
+
+    #restart-btn {
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 0.75rem 2rem;
+      border: none;
+      border-radius: 8px;
+      background: var(--accent-win);
+      color: var(--bg);
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.15s;
+    }
+
+    #restart-btn:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+    }
+
+    @media (max-width: 560px) {
+      .board {
+        grid-template-columns: 1fr;
+      }
+
+      .keyboard {
+        grid-template-columns: repeat(7, 1fr);
+      }
+
+      #word-display {
+        font-size: 1.35rem;
+        letter-spacing: 0.25em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="game">
+    <header>
+      <h1>HANGMAN</h1>
+    </header>
+
+    <div class="board">
+      <div class="figure-panel" aria-hidden="true">
+        <svg viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
+          <g class="gallows" stroke="#e8eaed" stroke-width="3" stroke-linecap="round" fill="none">
+            <line x1="20" y1="230" x2="100" y2="230" />
+            <line x1="60" y1="230" x2="60" y2="20" />
+            <line x1="60" y1="20" x2="140" y2="20" />
+            <line x1="140" y1="20" x2="140" y2="45" />
+          </g>
+          <circle data-stage="1" cx="140" cy="65" r="18" stroke="#e8eaed" stroke-width="3" fill="none" />
+          <line data-stage="2" x1="140" y1="83" x2="140" y2="150" stroke="#e8eaed" stroke-width="3" stroke-linecap="round" />
+          <line data-stage="3" x1="140" y1="100" x2="110" y2="130" stroke="#e8eaed" stroke-width="3" stroke-linecap="round" />
+          <line data-stage="4" x1="140" y1="100" x2="170" y2="130" stroke="#e8eaed" stroke-width="3" stroke-linecap="round" />
+          <line data-stage="5" x1="140" y1="150" x2="115" y2="195" stroke="#e8eaed" stroke-width="3" stroke-linecap="round" />
+          <line data-stage="6" x1="140" y1="150" x2="165" y2="195" stroke="#e8eaed" stroke-width="3" stroke-linecap="round" />
+        </svg>
+      </div>
+
+      <div class="info-panel">
+        <div id="word-display" aria-live="polite" aria-atomic="true"></div>
+        <p id="wrong-counter">Wrong guesses: 0 / 6</p>
+      </div>
+    </div>
+
+    <div class="keyboard" id="keyboard" role="group" aria-label="Letter keyboard"></div>
+
+    <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="overlay-title">
+      <div class="overlay-card" id="overlay-card">
+        <h2 id="overlay-title"></h2>
+        <p id="overlay-message"></p>
+        <button type="button" id="restart-btn">Play again</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const WORDS = [
+      'apple', 'bridge', 'planet', 'python', 'rocket',
+      'shadow', 'tiger', 'window', 'yellow', 'guitar',
+      'ocean', 'forest', 'castle', 'silver', 'monkey'
+    ];
+    const MAX_WRONG = 6;
+    const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+    const state = {
+      word: '',
+      guessed: new Set(),
+      wrongCount: 0,
+      status: 'playing'
+    };
+
+    const wordDisplay = document.getElementById('word-display');
+    const wrongCounter = document.getElementById('wrong-counter');
+    const keyboardEl = document.getElementById('keyboard');
+    const overlay = document.getElementById('overlay');
+    const overlayCard = document.getElementById('overlay-card');
+    const overlayTitle = document.getElementById('overlay-title');
+    const overlayMessage = document.getElementById('overlay-message');
+    const restartBtn = document.getElementById('restart-btn');
+    const hangmanParts = document.querySelectorAll('[data-stage]');
+
+    function pickWord() {
+      return WORDS[Math.floor(Math.random() * WORDS.length)];
+    }
+
+    function initGame() {
+      state.word = pickWord();
+      state.guessed = new Set();
+      state.wrongCount = 0;
+      state.status = 'playing';
+      render();
+    }
+
+    function handleGuess(letter) {
+      const lower = letter.toLowerCase();
+      if (state.status !== 'playing' || state.guessed.has(lower)) return;
+
+      state.guessed.add(lower);
+
+      if (!state.word.includes(lower)) {
+        state.wrongCount++;
+      }
+
+      if (isWin()) {
+        state.status = 'won';
+      } else if (state.wrongCount >= MAX_WRONG) {
+        state.status = 'lost';
+      }
+
+      render();
+    }
+
+    function isWin() {
+      const unique = [...new Set(state.word.split(''))];
+      return unique.every((ch) => state.guessed.has(ch));
+    }
+
+    function render() {
+      renderWord();
+      renderHangman(state.wrongCount);
+      renderCounter();
+      renderKeyboard();
+      renderOverlay();
+    }
+
+    function renderWord() {
+      wordDisplay.classList.remove('reveal-answer', 'win');
+
+      if (state.status === 'lost') {
+        wordDisplay.textContent = state.word.toUpperCase();
+        wordDisplay.classList.add('reveal-answer');
+        return;
+      }
+
+      const chars = state.word.split('').map((ch) => {
+        if (state.guessed.has(ch)) return ch.toUpperCase();
+        return '_';
+      });
+      wordDisplay.textContent = chars.join(' ');
+
+      if (state.status === 'won') {
+        wordDisplay.classList.add('win');
+      }
+    }
+
+    function renderHangman(n) {
+      hangmanParts.forEach((part) => {
+        const stage = Number(part.dataset.stage);
+        part.classList.toggle('visible', stage <= n);
+      });
+    }
+
+    function renderCounter() {
+      wrongCounter.textContent = `Wrong guesses: ${state.wrongCount} / ${MAX_WRONG}`;
+      wrongCounter.classList.toggle('danger', state.wrongCount >= MAX_WRONG - 1 && state.status === 'playing');
+    }
+
+    function renderKeyboard() {
+      keyboardEl.querySelectorAll('button').forEach((btn) => {
+        const letter = btn.dataset.letter;
+        const lower = letter.toLowerCase();
+        const guessed = state.guessed.has(lower);
+        const inWord = state.word.includes(lower);
+
+        btn.disabled = guessed || state.status !== 'playing';
+        btn.classList.remove('correct', 'wrong');
+
+        if (guessed) {
+          btn.classList.add(inWord ? 'correct' : 'wrong');
+        }
+      });
+    }
+
+    function renderOverlay() {
+      if (state.status === 'playing') {
+        overlay.classList.remove('show');
+        return;
+      }
+
+      overlay.classList.add('show');
+      overlayCard.classList.remove('win', 'lose');
+
+      if (state.status === 'won') {
+        overlayCard.classList.add('win');
+        overlayTitle.textContent = 'You won!';
+        overlayMessage.textContent = `Great job! The word was ${state.word.toUpperCase()}.`;
+      } else {
+        overlayCard.classList.add('lose');
+        overlayTitle.textContent = 'Game over';
+        overlayMessage.innerHTML = `The word was: <strong>${state.word.toUpperCase()}</strong>`;
+      }
+    }
+
+    function buildKeyboard() {
+      ALPHABET.split('').forEach((letter) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.dataset.letter = letter;
+        btn.textContent = letter;
+        btn.setAttribute('aria-label', `Guess letter ${letter}`);
+        btn.addEventListener('click', () => handleGuess(letter));
+        keyboardEl.appendChild(btn);
+      });
+    }
+
+    restartBtn.addEventListener('click', initGame);
+
+    document.addEventListener('DOMContentLoaded', () => {
+      buildKeyboard();
+      initGame();
+    });
+  </script>
+</body>
+</html>
