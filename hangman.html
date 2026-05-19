@@ -35,12 +35,125 @@
       align-items: center;
       justify-content: center;
       padding: 1.5rem;
+      overflow-x: hidden;
+    }
+
+    .bg-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .bg-base {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, #1a2236 0%, transparent 55%),
+        radial-gradient(ellipse 70% 50% at 100% 100%, #141c28 0%, transparent 50%),
+        linear-gradient(165deg, #080a10 0%, #0f1117 40%, #0a0e18 100%);
+    }
+
+    .bg-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.55;
+      will-change: transform;
+    }
+
+    .bg-orb--1 {
+      width: 420px;
+      height: 420px;
+      top: -8%;
+      left: -6%;
+      background: radial-gradient(circle, #3d5a80 0%, transparent 70%);
+      animation: drift1 22s ease-in-out infinite;
+    }
+
+    .bg-orb--2 {
+      width: 360px;
+      height: 360px;
+      bottom: -5%;
+      right: -4%;
+      background: radial-gradient(circle, #2d6a5a 0%, transparent 70%);
+      animation: drift2 26s ease-in-out infinite;
+    }
+
+    .bg-orb--3 {
+      width: 280px;
+      height: 280px;
+      top: 45%;
+      left: 55%;
+      background: radial-gradient(circle, #5c4d7a 0%, transparent 70%);
+      animation: drift3 19s ease-in-out infinite;
+    }
+
+    .bg-mesh {
+      position: absolute;
+      inset: 0;
+      background:
+        conic-gradient(from 220deg at 30% 20%, rgba(110, 231, 183, 0.06), transparent 35%),
+        conic-gradient(from 40deg at 75% 70%, rgba(96, 165, 250, 0.07), transparent 40%),
+        conic-gradient(from 180deg at 50% 50%, rgba(248, 113, 113, 0.04), transparent 45%);
+      animation: meshRotate 60s linear infinite;
+    }
+
+    .bg-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse 70% 70% at 50% 45%, black 20%, transparent 75%);
+    }
+
+    .bg-noise {
+      position: absolute;
+      inset: 0;
+      opacity: 0.35;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay;
+    }
+
+    .bg-vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 35%, rgba(0, 0, 0, 0.55) 100%);
+    }
+
+    @keyframes drift1 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(6%, 8%) scale(1.08); }
+      66% { transform: translate(3%, -4%) scale(0.95); }
+    }
+
+    @keyframes drift2 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(-8%, -6%) scale(1.1); }
+    }
+
+    @keyframes drift3 {
+      0%, 100% { transform: translate(0, 0); }
+      40% { transform: translate(-12%, 6%); }
+      80% { transform: translate(5%, -8%); }
+    }
+
+    @keyframes meshRotate {
+      to { transform: rotate(360deg); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .bg-orb, .bg-mesh { animation: none; }
     }
 
     .game {
       width: 100%;
       max-width: 720px;
       position: relative;
+      z-index: 1;
     }
 
     header {
@@ -52,13 +165,20 @@
       font-size: 2.25rem;
       font-weight: 700;
       letter-spacing: 0.15em;
+      text-shadow: 0 0 40px rgba(110, 231, 183, 0.15);
     }
 
     .board {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 1.25rem;
-      background: var(--surface);
+      background: rgba(26, 29, 39, 0.55);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow:
+        0 4px 24px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
       border-radius: var(--radius);
       padding: 1.5rem;
       margin-bottom: 1.25rem;
@@ -138,12 +258,14 @@
       font-size: 1rem;
       font-weight: 600;
       aspect-ratio: 1;
-      border: 2px solid transparent;
+      border: 1px solid rgba(255, 255, 255, 0.06);
       border-radius: 8px;
-      background: var(--btn);
+      background: rgba(37, 42, 54, 0.65);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       color: var(--text);
       cursor: pointer;
-      transition: background 0.15s, transform 0.15s, border-color 0.15s;
+      transition: background 0.15s, transform 0.15s, border-color 0.15s, box-shadow 0.15s;
     }
 
     .keyboard button:hover:not(:disabled) {
@@ -182,7 +304,11 @@
     }
 
     .overlay-card {
-      background: var(--surface);
+      background: rgba(26, 29, 39, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
       border-radius: var(--radius);
       padding: 2rem 2.5rem;
       text-align: center;
@@ -260,6 +386,17 @@
   </style>
 </head>
 <body>
+  <div class="bg-canvas" aria-hidden="true">
+    <div class="bg-base"></div>
+    <div class="bg-orb bg-orb--1"></div>
+    <div class="bg-orb bg-orb--2"></div>
+    <div class="bg-orb bg-orb--3"></div>
+    <div class="bg-mesh"></div>
+    <div class="bg-grid"></div>
+    <div class="bg-noise"></div>
+    <div class="bg-vignette"></div>
+  </div>
+
   <div class="game">
     <header>
       <h1>HANGMAN</h1>
