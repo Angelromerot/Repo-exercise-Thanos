@@ -212,6 +212,22 @@
       opacity: 1;
     }
 
+    .figure-panel svg .laser-beam {
+      animation: laserPulse 1.8s ease-in-out infinite;
+    }
+
+    @keyframes laserPulse {
+      0%, 100% { opacity: 0.75; }
+      50% { opacity: 1; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .figure-panel svg .laser-beam {
+        animation: none;
+        opacity: 0.9;
+      }
+    }
+
     .info-panel {
       display: flex;
       flex-direction: column;
@@ -406,66 +422,141 @@
       <div class="figure-panel" aria-hidden="true">
         <svg viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <defs>
-            <linearGradient id="woodGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#a67c52"/>
-              <stop offset="100%" stop-color="#8b5e3c"/>
+            <linearGradient id="frameGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#6ee7b7"/>
+              <stop offset="100%" stop-color="#60a5fa"/>
             </linearGradient>
+            <linearGradient id="suitGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#353b4a"/>
+              <stop offset="100%" stop-color="#1e222d"/>
+            </linearGradient>
+            <linearGradient id="visorGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#6ee7b7" stop-opacity="0.9"/>
+              <stop offset="100%" stop-color="#a78bfa" stop-opacity="0.9"/>
+            </linearGradient>
+            <linearGradient id="ironH" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#4a5159"/>
+              <stop offset="12%" stop-color="#9aa5b3"/>
+              <stop offset="28%" stop-color="#e8edf2"/>
+              <stop offset="42%" stop-color="#b8c2cc"/>
+              <stop offset="58%" stop-color="#6d7680"/>
+              <stop offset="75%" stop-color="#a3adb8"/>
+              <stop offset="90%" stop-color="#5a626c"/>
+              <stop offset="100%" stop-color="#3d444c"/>
+            </linearGradient>
+            <linearGradient id="ironV" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#525a63"/>
+              <stop offset="15%" stop-color="#c5cdd6"/>
+              <stop offset="32%" stop-color="#eef2f6"/>
+              <stop offset="48%" stop-color="#8e98a3"/>
+              <stop offset="65%" stop-color="#5e6771"/>
+              <stop offset="82%" stop-color="#9da7b1"/>
+              <stop offset="100%" stop-color="#404850"/>
+            </linearGradient>
+            <linearGradient id="ironCap" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#b0bac4"/>
+              <stop offset="50%" stop-color="#6e7882"/>
+              <stop offset="100%" stop-color="#3a4149"/>
+            </linearGradient>
+            <linearGradient id="laserGrad" gradientUnits="userSpaceOnUse" x1="140" y1="30" x2="140" y2="62">
+              <stop offset="0%" stop-color="#6ee7b7"/>
+              <stop offset="45%" stop-color="#a7f3d0"/>
+              <stop offset="55%" stop-color="#ffffff"/>
+              <stop offset="100%" stop-color="#60a5fa"/>
+            </linearGradient>
+            <filter id="laserGlow" x="-80%" y="-5%" width="260%" height="110%">
+              <feGaussianBlur stdDeviation="3" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+            <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur stdDeviation="2" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
           </defs>
 
-          <!-- Cartoon gallows -->
+          <!-- Shiny iron I-beam frame -->
           <g class="gallows">
-            <rect x="12" y="228" width="88" height="10" rx="4" fill="url(#woodGrad)" stroke="#5c3d28" stroke-width="1.5"/>
-            <rect x="52" y="24" width="12" height="206" rx="4" fill="url(#woodGrad)" stroke="#5c3d28" stroke-width="1.5"/>
-            <rect x="52" y="18" width="96" height="12" rx="4" fill="url(#woodGrad)" stroke="#5c3d28" stroke-width="1.5"/>
-            <path d="M140 30 Q142 52 140 58" stroke="#c9a87c" stroke-width="3" fill="none" stroke-linecap="round"/>
-            <circle cx="140" cy="60" r="3" fill="#c9a87c"/>
+            <!-- Base plate -->
+            <rect x="16" y="226" width="90" height="10" rx="2" fill="url(#ironH)" stroke="#2e343b" stroke-width="1"/>
+            <rect x="20" y="228" width="28" height="2" rx="1" fill="#fff" opacity="0.22"/>
+
+            <!-- Vertical I-beam -->
+            <rect x="48" y="22" width="16" height="206" rx="1" fill="url(#ironV)" stroke="#2e343b" stroke-width="1"/>
+            <rect x="50" y="26" width="3" height="198" rx="1" fill="#fff" opacity="0.28"/>
+            <rect x="59" y="26" width="1.5" height="198" fill="#fff" opacity="0.08"/>
+            <!-- Vertical flange hints -->
+            <rect x="46" y="22" width="3" height="206" fill="#3d444c" opacity="0.5"/>
+            <rect x="63" y="22" width="3" height="206" fill="#2a3038" opacity="0.4"/>
+
+            <!-- Horizontal I-beam -->
+            <rect x="48" y="18" width="104" height="14" rx="1" fill="url(#ironH)" stroke="#2e343b" stroke-width="1"/>
+            <rect x="52" y="20" width="96" height="3" rx="1" fill="#fff" opacity="0.25"/>
+            <rect x="48" y="16" width="104" height="3" fill="#3d444c" opacity="0.35"/>
+            <rect x="48" y="31" width="104" height="2" fill="#2a3038" opacity="0.3"/>
+
+            <!-- Laser emitter housing -->
+            <rect x="132" y="14" width="16" height="10" rx="2" fill="url(#ironCap)" stroke="#2e343b" stroke-width="0.75"/>
+            <rect x="136" y="22" width="8" height="6" rx="1" fill="#1e222d" stroke="#6ee7b7" stroke-width="1"/>
+            <circle cx="140" cy="25" r="2.5" fill="#6ee7b7" opacity="0.9"/>
+
+            <!-- Laser beam -->
+            <g class="laser-beam" filter="url(#laserGlow)">
+              <line x1="140" y1="28" x2="140" y2="62" stroke="#6ee7b7" stroke-width="10" stroke-linecap="round" opacity="0.2"/>
+              <line x1="140" y1="28" x2="140" y2="62" stroke="url(#laserGrad)" stroke-width="4" stroke-linecap="round" opacity="0.85"/>
+              <line x1="140" y1="28" x2="140" y2="62" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round"/>
+              <circle cx="140" cy="62" r="3.5" fill="none" stroke="#6ee7b7" stroke-width="1.5" opacity="0.9"/>
+              <circle cx="140" cy="62" r="1.5" fill="#fff"/>
+            </g>
+            <!-- Rivets -->
+            <circle cx="54" cy="24" r="1.5" fill="#8e98a3" stroke="#4a5159" stroke-width="0.5"/>
+            <circle cx="54" cy="230" r="1.5" fill="#8e98a3" stroke="#4a5159" stroke-width="0.5"/>
+            <circle cx="142" cy="24" r="1.5" fill="#8e98a3" stroke="#4a5159" stroke-width="0.5"/>
           </g>
 
-          <!-- Stage 1: Head -->
-          <g data-stage="1">
-            <circle cx="140" cy="82" r="26" fill="#ffcc99" stroke="#5c4033" stroke-width="2.5"/>
-            <ellipse cx="140" cy="78" rx="24" ry="8" fill="#e8a86a" opacity="0.35"/>
-            <circle cx="130" cy="80" r="7" fill="#fff" stroke="#5c4033" stroke-width="1.5"/>
-            <circle cx="150" cy="80" r="7" fill="#fff" stroke="#5c4033" stroke-width="1.5"/>
-            <circle cx="131" cy="81" r="3" fill="#2d2d2d"/>
-            <circle cx="151" cy="81" r="3" fill="#2d2d2d"/>
-            <circle cx="132" cy="79" r="1.2" fill="#fff"/>
-            <circle cx="152" cy="79" r="1.2" fill="#fff"/>
-            <ellipse cx="126" cy="90" rx="4" ry="2.5" fill="#f4a4a4" opacity="0.7"/>
-            <ellipse cx="154" cy="90" rx="4" ry="2.5" fill="#f4a4a4" opacity="0.7"/>
-            <path d="M132 96 Q140 102 148 96" stroke="#5c4033" stroke-width="2" fill="none" stroke-linecap="round"/>
-            <path d="M158 72 Q165 68 168 74" stroke="#5c4033" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <!-- Stage 1: Head (visor helmet) -->
+          <g data-stage="1" filter="url(#softGlow)">
+            <rect x="116" y="62" width="48" height="44" rx="16" fill="url(#suitGrad)" stroke="#4b5563" stroke-width="1.5"/>
+            <rect x="122" y="72" width="36" height="14" rx="7" fill="url(#visorGrad)"/>
+            <line x1="128" y1="79" x2="136" y2="79" stroke="#0f1117" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+            <line x1="144" y1="79" x2="152" y2="79" stroke="#0f1117" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+            <rect x="132" y="94" width="16" height="3" rx="1.5" fill="#6b7280" opacity="0.6"/>
           </g>
 
           <!-- Stage 2: Body -->
           <g data-stage="2">
-            <ellipse cx="140" cy="128" rx="22" ry="28" fill="#4a90d9" stroke="#2d5a8a" stroke-width="2"/>
-            <ellipse cx="140" cy="118" rx="18" ry="8" fill="#6aa8e8" opacity="0.5"/>
-            <path d="M128 108 L140 100 L152 108" fill="#4a90d9" stroke="#2d5a8a" stroke-width="2" stroke-linejoin="round"/>
+            <rect x="118" y="108" width="44" height="48" rx="14" fill="url(#suitGrad)" stroke="#4b5563" stroke-width="1.5"/>
+            <rect x="124" y="118" width="32" height="4" rx="2" fill="url(#frameGrad)" opacity="0.85"/>
+            <rect x="130" y="128" width="20" height="3" rx="1.5" fill="#4b5563" opacity="0.5"/>
           </g>
 
           <!-- Stage 3: Left arm -->
           <g data-stage="3">
-            <ellipse cx="108" cy="122" rx="10" ry="16" fill="#ffcc99" stroke="#5c4033" stroke-width="2" transform="rotate(-35 108 122)"/>
-            <circle cx="100" cy="138" r="7" fill="#ffcc99" stroke="#5c4033" stroke-width="2"/>
+            <rect x="88" y="112" width="28" height="12" rx="6" fill="url(#suitGrad)" stroke="#4b5563" stroke-width="1.5" transform="rotate(-28 102 118)"/>
+            <circle cx="92" cy="132" r="7" fill="#2a2f3a" stroke="#6ee7b7" stroke-width="1.5"/>
           </g>
 
           <!-- Stage 4: Right arm -->
           <g data-stage="4">
-            <ellipse cx="172" cy="122" rx="10" ry="16" fill="#ffcc99" stroke="#5c4033" stroke-width="2" transform="rotate(35 172 122)"/>
-            <circle cx="180" cy="138" r="7" fill="#ffcc99" stroke="#5c4033" stroke-width="2"/>
+            <rect x="164" y="112" width="28" height="12" rx="6" fill="url(#suitGrad)" stroke="#4b5563" stroke-width="1.5" transform="rotate(28 176 118)"/>
+            <circle cx="188" cy="132" r="7" fill="#2a2f3a" stroke="#60a5fa" stroke-width="1.5"/>
           </g>
 
           <!-- Stage 5: Left leg -->
           <g data-stage="5">
-            <ellipse cx="128" cy="168" rx="11" ry="22" fill="#3d5a80" stroke="#2a3f5c" stroke-width="2"/>
-            <ellipse cx="126" cy="192" rx="12" ry="6" fill="#2d2d2d" stroke="#1a1a1a" stroke-width="1.5"/>
+            <rect x="122" y="156" width="14" height="36" rx="7" fill="url(#suitGrad)" stroke="#4b5563" stroke-width="1.5"/>
+            <rect x="118" y="188" width="22" height="10" rx="5" fill="#1a1d27" stroke="#6ee7b7" stroke-width="1.5"/>
           </g>
 
           <!-- Stage 6: Right leg -->
           <g data-stage="6">
-            <ellipse cx="152" cy="168" rx="11" ry="22" fill="#3d5a80" stroke="#2a3f5c" stroke-width="2"/>
-            <ellipse cx="154" cy="192" rx="12" ry="6" fill="#2d2d2d" stroke="#1a1a1a" stroke-width="1.5"/>
+            <rect x="144" y="156" width="14" height="36" rx="7" fill="url(#suitGrad)" stroke="#4b5563" stroke-width="1.5"/>
+            <rect x="140" y="188" width="22" height="10" rx="5" fill="#1a1d27" stroke="#60a5fa" stroke-width="1.5"/>
           </g>
         </svg>
       </div>
